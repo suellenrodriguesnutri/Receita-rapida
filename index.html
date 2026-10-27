@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1b4425">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Receitas">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icon-192.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
+<title>Faça Sua Receita</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: faixa verde de abertura; à esquerda colar e conferir a receita; à direita a "balança" com o peso total e a composição, e a sua quantidade */
+:root{
+  --bg:#eef3ea; --surface:#ffffff; --fg:#172219; --muted:#5f6d5c; --line:#dbe4d4;
+  --leaf:#2c6a39; --leaf-deep:#1b4425; --leaf-soft:#e1edda; --citrus:#f2c230; --citrus-soft:#fbefc4;
+  --lcd:#0f1710; --lcd-fg:#b8f07a; --bad:#c0261c; --bad-bg:#fbe1de; --shadow:0 1px 2px rgba(23,34,25,.06),0 8px 24px rgba(23,34,25,.06);
+  --c1:#2c6a39; --c2:#e9b210; --c3:#6fa64f; --c4:#3c8c80; --c5:#e0782b; --c6:#7b4f91; --c7:#4a84b6; --c8:#9aa23a;
+  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --body:"Figtree",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f150f; --surface:#182118; --fg:#e6eee1; --muted:#9aab93; --line:#2a3729;
+  --leaf:#7cc488; --leaf-deep:#163a1f; --leaf-soft:#203321; --citrus:#e9b923; --citrus-soft:#3a3014;
+  --lcd:#070b07; --lcd-fg:#b8f07a; --bad:#ff8f84; --bad-bg:#3d1c19; --shadow:0 1px 2px rgba(0,0,0,.3);
+  --c1:#7cc488; --c2:#f0c440; --c3:#a5d27e; --c4:#5fb8a9; --c5:#f0975a; --c6:#b48ac8; --c7:#7fb2df; --c8:#c4cb5e; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f150f; --surface:#182118; --fg:#e6eee1; --muted:#9aab93; --line:#2a3729;
+  --leaf:#7cc488; --leaf-deep:#163a1f; --leaf-soft:#203321; --citrus:#e9b923; --citrus-soft:#3a3014;
+  --lcd:#070b07; --lcd-fg:#b8f07a; --bad:#ff8f84; --bad-bg:#3d1c19; --shadow:0 1px 2px rgba(0,0,0,.3);
+  --c1:#7cc488; --c2:#f0c440; --c3:#a5d27e; --c4:#5fb8a9; --c5:#f0975a; --c6:#b48ac8; --c7:#7fb2df; --c8:#c4cb5e; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.45}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px 40px;display:grid;gap:20px}
+.num{font-variant-numeric:tabular-nums}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--citrus);outline-offset:2px}
+
+/* abertura */
+.hero{position:relative;overflow:hidden;background:var(--leaf-deep);color:#f3f8ef;border-radius:28px;padding:clamp(22px,5vw,44px);display:grid;grid-template-columns:minmax(0,1fr);gap:18px;align-items:center}
+.hero::before{content:"";position:absolute;inset:auto -20% -60% auto;width:70%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(242,194,48,.22),transparent 65%);pointer-events:none}
+@media (min-width:820px){.hero{grid-template-columns:minmax(0,1fr) 220px}}
+.eyebrow{font:700 .75rem var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--citrus);margin:0 0 10px}
+h1{font:800 clamp(2.1rem,6.4vw,3.6rem)/1.02 var(--display);margin:0;letter-spacing:-.025em;text-wrap:balance;max-width:16ch}
+h1 em{font-style:normal;color:var(--citrus)}
+.lead{margin:14px 0 0;color:#cfe0c8;max-width:52ch;font-size:1.05rem}
+.hero svg{display:none;position:relative}
+@media (min-width:820px){.hero svg{display:block;width:100%;height:auto}}
+.saved{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.saved:empty{display:none}
+.saved .lbl{font:600 .75rem var(--body);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-right:4px}
+.saved .chip{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:99px;background:var(--surface);overflow:hidden;box-shadow:var(--shadow)}
+.saved .chip button{border:0;background:none;color:var(--fg);font:600 .88rem var(--body);padding:8px 12px;cursor:pointer}
+.saved .chip button.x{color:var(--muted);padding:8px 10px 8px 2px}
+
+.grid{display:grid;grid-template-columns:minmax(0,1fr);gap:20px;align-items:start}
+@media (min-width:940px){.grid{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr)}.out{position:sticky;top:16px}}
+.col{display:grid;grid-template-columns:minmax(0,1fr);gap:20px;min-width:0}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:18px;display:grid;grid-template-columns:minmax(0,1fr);gap:14px;min-width:0;box-shadow:var(--shadow)}
+.step{display:flex;align-items:center;gap:12px}
+.step b{width:34px;height:34px;flex:none;border-radius:11px;background:var(--citrus);color:#1b2a12;display:grid;place-items:center;font:800 1.05rem var(--display)}
+.step h2{margin:0;font:800 1.3rem/1.15 var(--display);letter-spacing:-.01em}
+.hint{margin:0;color:var(--muted);font-size:.93rem}
+textarea{font:16px/1.55 var(--body);color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px;min-height:170px;resize:vertical;width:100%}
+.row-btns{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{font:700 .95rem var(--body);border:1px solid var(--line);background:var(--surface);color:var(--fg);padding:11px 16px;border-radius:99px;cursor:pointer}
+.btn.primary{background:var(--leaf);border-color:var(--leaf);color:var(--surface)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.ghost{background:none;color:var(--muted)}
+.btn.danger{background:none;border-color:var(--bad);color:var(--bad)}
+.btn.danger:hover{background:var(--bad-bg)}
+.confirmbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--bad-bg);color:var(--fg);border-radius:14px;padding:10px 12px;font-weight:600}
+.confirmbar .btn.primary{background:var(--bad);border-color:var(--bad);color:#fff}
+.ignored{font-size:.88rem;color:var(--muted);background:var(--bg);border-radius:10px;padding:8px 10px}
+
+.namein{font:800 1.2rem var(--display);color:var(--fg);background:transparent;border:0;border-bottom:2px solid var(--line);border-radius:0;padding:6px 2px;width:100%}
+.namein:focus{outline:none;border-bottom-color:var(--leaf)}
+.ings{display:grid;gap:8px}
+.ing{display:grid;grid-template-columns:minmax(0,1fr) 40px;grid-template-areas:"name del" "meas del";gap:6px 8px;padding:10px 10px 10px 14px;border:1px solid var(--line);border-left:5px solid var(--dot,var(--line));border-radius:14px;background:var(--bg)}
+.ing .name{grid-area:name}
+.ing .del{grid-area:del;align-self:start}
+.meas{grid-area:meas;display:grid;grid-template-columns:70px minmax(0,1fr) 20px 100px;gap:6px;align-items:center}
+.meas .eq{text-align:center;color:var(--muted);font-weight:700}
+.ing input,.ing select{font:500 16px var(--body);color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px;width:100%;min-width:0}
+.ing input.name{font-weight:700;background:transparent;border-color:transparent;padding-left:2px}
+.ing input.name:focus{background:var(--surface);border-color:var(--line)}
+.ing input.qty{text-align:right}
+.gbox{position:relative}
+.gbox input{text-align:right;padding-right:32px;font-weight:800;font-variant-numeric:tabular-nums}
+.gbox span{position:absolute;right:9px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.85rem;pointer-events:none}
+.gbox input.ov{border-color:var(--leaf);background:var(--leaf-soft)}
+.note{grid-column:1/-1;font-size:.82rem;border-radius:8px;padding:5px 8px}
+.note.warn{background:var(--citrus-soft);color:var(--fg)}
+.note.info{color:var(--muted);padding:0 2px}
+.del{width:40px;height:40px;border:0;background:none;color:var(--muted);font-size:1.4rem;cursor:pointer;border-radius:10px}
+.del:hover{color:var(--bad);background:var(--bad-bg)}
+.add{font:700 .95rem var(--body);border:2px dashed var(--line);background:none;color:var(--leaf);padding:12px;border-radius:14px;cursor:pointer}
+.add:hover{border-color:var(--leaf);background:var(--leaf-soft)}
+@media (max-width:420px){.meas{grid-template-columns:62px minmax(0,1fr)}.meas .eq{display:none}.meas .gbox{grid-column:1/-1}}
+
+/* balança */
+.scale{background:var(--lcd);border-radius:18px;padding:16px 18px 14px;display:grid;gap:6px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06),inset 0 10px 30px rgba(0,0,0,.35)}
+.scale .top{display:flex;justify-content:space-between;font:700 .68rem var(--mono);letter-spacing:.14em;text-transform:uppercase;color:#6f8a63}
+.scale .disp{display:flex;align-items:baseline;justify-content:flex-end;gap:10px;color:var(--lcd-fg);text-shadow:0 0 18px rgba(184,240,122,.35)}
+.scale .disp span:first-child{font:700 clamp(2.6rem,11vw,3.6rem)/1 var(--mono);letter-spacing:-.02em}
+.scale .disp span:last-child{font:700 1.4rem var(--mono)}
+.comp{display:flex;height:16px;border-radius:99px;overflow:hidden;gap:2px;background:var(--line)}
+.comp i{display:block;height:100%;min-width:3px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:.84rem;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i,.dot{width:10px;height:10px;border-radius:3px;display:inline-block;flex:none}
+
+/* sua quantidade */
+.tin{display:flex;align-items:center;gap:8px;background:var(--bg);border:2px solid var(--line);border-radius:16px;padding:0 16px}
+.tin input{flex:1;min-width:0;width:100%;border:0;background:none;color:var(--fg);font:800 2rem var(--display);padding:10px 0;font-variant-numeric:tabular-nums}
+.tin input:focus{outline:none}
+.tin:focus-within{border-color:var(--leaf)}
+.tin span{color:var(--muted);font:700 1.2rem var(--display)}
+.target{display:grid;gap:8px}
+.quick{display:flex;gap:6px;flex-wrap:wrap}
+.quick button{font:700 .86rem var(--body);border:1px solid var(--line);background:var(--surface);color:var(--fg);padding:8px 13px;border-radius:99px;cursor:pointer}
+.quick button:hover{border-color:var(--leaf);color:var(--leaf)}
+
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:16px}
+table{border-collapse:collapse;width:100%;font-size:.95rem}
+th,td{padding:11px 12px;text-align:right;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums;vertical-align:middle}
+th:first-child,td:first-child{text-align:left}
+th{font:700 .7rem var(--body);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);background:var(--bg)}
+td .nm{display:flex;align-items:center;gap:8px;font-weight:600}
+td small{display:block;color:var(--muted);font-size:.78rem;margin:2px 0 0 18px}
+td.pct span{display:inline-block;background:var(--leaf-soft);color:var(--leaf);font-weight:800;border-radius:99px;padding:3px 9px;font-size:.88rem}
+td.new{font:800 1.1rem var(--display)}
+tfoot td{font-weight:800;background:var(--leaf-soft);border-bottom:0}
+tfoot td.new{color:var(--leaf)}
+.copied{font-size:.88rem;color:var(--leaf);font-weight:700}
+.empty{color:var(--muted);font-size:.95rem;margin:0}
+footer{color:var(--muted);font-size:.85rem;display:grid;gap:4px;border-top:1px solid var(--line);padding-top:14px}
+footer b{color:var(--fg)}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header class="hero">
+    <div>
+      <p class="eyebrow">Suellen Rodrigues · Nutricionista</p>
+      <h1>Faça sua receita <em>na quantidade que você quiser</em></h1>
+      <p class="lead">Cole qualquer receita da internet. Convertemos tudo para gramas e ajustamos cada ingrediente para a quantidade que você precisa, mantendo o padrão da receita.</p>
+    </div>
+    <svg viewBox="0 0 220 200" aria-hidden="true" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M40 60h92l-8 118a10 10 0 0 1-10 9H58a10 10 0 0 1-10-9z" stroke="#f3f8ef" stroke-width="5" fill="rgba(243,248,239,.06)"/>
+      <path d="M132 78h14a16 16 0 0 1 0 32h-18" stroke="#f3f8ef" stroke-width="5"/>
+      <path d="M52 120q34-10 76 0l-4 58a10 10 0 0 1-10 9H58a10 10 0 0 1-10-9z" fill="#f2c230" opacity=".9"/>
+      <path d="M62 84h18M62 100h12M62 116h18" stroke="#f2c230" stroke-width="4"/>
+      <circle cx="176" cy="40" r="16" stroke="#f2c230" stroke-width="5"/>
+      <path d="M176 56v50" stroke="#f2c230" stroke-width="5"/>
+      <circle cx="196" cy="128" r="10" stroke="#f3f8ef" stroke-width="4"/>
+      <path d="M196 138v44" stroke="#f3f8ef" stroke-width="4"/>
+    </svg>
+  </header>
+
+  <div class="saved" id="saved"></div>
+
+  <div class="grid">
+    <div class="col">
+      <section class="card">
+        <div class="step"><b>1</b><h2>Cole a receita</h2></div>
+        <p class="hint">Um ingrediente por linha, do jeito que veio da internet: "2 xícaras de farinha de trigo", "3 ovos", "1/2 xícara de óleo".</p>
+        <textarea id="paste" placeholder="2 xícaras de farinha de trigo&#10;3 ovos&#10;1 xícara de leite"></textarea>
+        <div class="row-btns">
+          <button class="btn primary" id="convert">Converter para gramas</button>
+          <button class="btn danger clearall">Apagar tudo</button>
+        </div>
+        <div class="ignored" id="ignored" hidden></div>
+      </section>
+
+      <section class="card">
+        <div class="step"><b>2</b><h2>Confira em gramas e ml</h2></div>
+        <input class="namein" id="rname" placeholder="Nome da receita" aria-label="Nome da receita">
+        <p class="hint">Se souber o peso exato, digite direto no campo de gramas. Ele passa a valer no lugar da conversão.</p>
+        <div class="ings" id="ings"></div>
+        <button class="add" id="addIng">+ Adicionar ingrediente</button>
+      </section>
+    </div>
+
+    <div class="out col">
+      <section class="card">
+        <div class="step"><b>3</b><h2>Peso total da receita</h2></div>
+        <div class="scale" aria-live="polite">
+          <div class="top"><span>Balança</span><span id="totalN">0 itens</span></div>
+          <div class="disp"><span class="num" id="totalW">0</span><span>g</span></div>
+        </div>
+        <div class="comp" id="comp" aria-hidden="true"></div>
+        <div class="legend" id="legend"></div>
+      </section>
+
+      <section class="card">
+        <div class="step"><b>4</b><h2>Faça sua própria quantidade</h2></div>
+        <div class="target">
+          <label class="hint" for="target">Quanto você quer fazer no total?</label>
+          <div class="tin"><input id="target" inputmode="decimal"><span>g</span></div>
+          <div class="quick" id="quick">
+            <button data-t="orig">Igual à original</button><button data-t="250">250 g</button><button data-t="500">500 g</button><button data-t="1000">1 kg</button><button data-t="2000">2 kg</button>
+          </div>
+        </div>
+        <div id="resTable"></div>
+        <div class="row-btns">
+          <button class="btn primary" id="copy">Copiar resultado</button>
+          <button class="btn" id="save">Salvar receita</button>
+          <button class="btn danger clearall">Apagar tudo</button>
+          <span class="copied" id="copied" aria-live="polite"></span>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <footer>
+    <div><b>Suellen Rodrigues</b> · Nutricionista · @suellenrodrigues.nutri</div>
+    <div>Conversões de xícara e colher são aproximadas (1 xícara = 240 ml, 1 colher de sopa = 15 ml, 1 colher de chá = 5 ml). Para somar, 1 ml conta como 1 g.</div>
+  </footer>
+</div>
+
+<script>
+/* ===== tabelas de conversão ===== */
+const VOL={xic:240,cs:15,csb:10,cc:5,ml:1,l:1000};
+const UNITS=[["g","g"],["kg","kg"],["ml","ml"],["l","litro"],["xic","xícara"],["cs","colher de sopa"],["csb","colher de sobremesa"],["cc","colher de chá"],["un","unidade"],["pitada","pitada"]];
+// gramas em 1 xícara (240 ml) de ingredientes secos — valores aproximados
+const DRY=[
+  ["farinha de amendoa",100],["farinha de aveia",90],["farinha de trigo integral",120],["farinha integral",120],["farinha de trigo",120],
+  ["farelo de aveia",90],["aveia",80],
+  ["acucar mascavo",150],["acucar demerara",180],["acucar cristal",180],["acucar refinado",180],["acucar",180],
+  ["cacau",90],["chocolate em po",90],["achocolatado",90],
+  ["amido de milho",150],["maisena",150],["coco ralado",80],
+  ["manteiga",200],["margarina",200]
+];
+const LIQ=["leite de coco","leite","agua","oleo","azeite","suco","creme de leite","iogurte","mel","cafe","bebida vegetal","vinagre","essencia","extrato de baunilha"];
+const UNITW=[["gema",20],["clara",30],["ovo",50],["banana",100]];
+const norm=s=>String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+
+/* ===== leitura da linha ===== */
+const FR={"½":.5,"¼":.25,"¾":.75,"⅓":1/3,"⅔":2/3,"⅛":.125};
+const WORDS={meia:.5,meio:.5,um:1,uma:1,dois:2,duas:2,tres:3,quatro:4,cinco:5,seis:6};
+const UNIT_RX=[
+  [/^(xicaras?|xic\.?)(\s*\(?\s*(de\s+)?(cha)\s*\)?)?\s+/,"xic"],
+  [/^(colher(?:es)?|col\.?)\s*\(?\s*(de\s+)?sopa\s*\)?\s+/,"cs"],
+  [/^(colher(?:es)?|col\.?)\s*\(?\s*(de\s+)?sobremesa\s*\)?\s+/,"csb"],
+  [/^(colher(?:es)?|col\.?)\s*\(?\s*(de\s+)?(cha|cafe)\s*\)?\s+/,"cc"],
+  [/^colher(?:es)?\s+/,"cs"],
+  [/^(quilos?|kg)\.?\s+/,"kg"],
+  [/^(gramas?|gr?)\.?\s+/,"g"],
+  [/^(mililitros?|ml)\.?\s+/,"ml"],
+  [/^(litros?|l)\.?\s+/,"l"],
+  [/^(unidades?|un\.?)\s+/,"un"],
+  [/^pitadas?\s+/,"pitada"]
+];
+function parseLine(line){
+  let t=line.trim().replace(/^[-•*·▪︎–]\s*/,"");
+  if(!t)return null;
+  t=t.replace(/(\d)?\s*([½¼¾⅓⅔⅛])/g,(m,a,f)=>String((a?+a:0)+FR[f])+" ");
+  let q=null,m;
+  if((m=t.match(/^(\d+)\s+(\d+)\/(\d+)/)))q=+m[1]+m[2]/m[3];
+  else if((m=t.match(/^(\d+)\/(\d+)/)))q=m[1]/m[2];
+  else if((m=t.match(/^(\d+(?:[.,]\d+)?)/)))q=parseFloat(m[1].replace(",","."));
+  else if((m=norm(t).match(/^(meia|meio|uma|um|duas|dois|tres|quatro|cinco|seis)\b/)))q=WORDS[m[1]];
+  if(q==null||!isFinite(q))return {ignored:line.trim()};
+  let rest=t.slice(m[0].length).trim()+" ";
+  let u=null;
+  for(const [rx,code] of UNIT_RX){const mm=norm(rest).match(rx);if(mm){u=code;rest=rest.slice(mm[0].length);break}}
+  rest=rest.trim().replace(/^(de|do|da|dos|das)\s+/i,"").replace(/\s*\(.*?\)\s*/g," ").trim();
+  if(!u)u="un";
+  if(!rest)return {ignored:line.trim()};
+  return {name:rest.charAt(0).toUpperCase()+rest.slice(1),q,u,ov:null};
+}
+
+/* ===== conversão ===== */
+function convert(r){
+  const n=norm(r.name||""),q=+r.q||0;
+  if(r.ov!=null&&r.ov!==""){return {v:pnum(r.ov),kind:kindOf(r),note:["info","Peso digitado por você."]}}
+  if(r.u==="g")return {v:q,kind:"g"};
+  if(r.u==="kg")return {v:q*1000,kind:"g"};
+  if(r.u==="ml")return {v:q,kind:"ml"};
+  if(r.u==="l")return {v:q*1000,kind:"ml"};
+  if(r.u==="pitada")return {v:q*0.5,kind:"g",note:["info","1 pitada ≈ 0,5 g"]};
+  if(r.u==="un"){
+    const w=UNITW.find(([k])=>n.includes(k));
+    if(w)return {v:q*w[1],kind:"g",note:["info",`1 ${w[0]} ≈ ${w[1]} g`]};
+    return {v:0,kind:"g",note:["warn","Digite o peso total em gramas no campo ao lado."]};
+  }
+  const ml=q*VOL[r.u];
+  const dry=DRY.find(([k])=>n.includes(k));
+  if(dry)return {v:ml/240*dry[1],kind:"g",note:["info",`1 xícara ≈ ${dry[1]} g`]};
+  if(LIQ.some(k=>n.includes(k)))return {v:ml,kind:"ml"};
+  return {v:ml,kind:"ml",note:["warn","Medida em volume. Se for ingrediente seco, confira o peso na embalagem ou numa balança."]};
+}
+const COL=i=>`var(--c${(i%8)+1})`;
+const kindOf=r=>["ml","l"].includes(r.u)||LIQ.some(k=>norm(r.name||"").includes(k))?"ml":"g";
+function pnum(s){if(s==null)return 0;s=String(s).trim();if(!s)return 0;if(s.includes(","))s=s.replace(/\./g,"").replace(",",".");const n=parseFloat(s);return isNaN(n)?0:n}
+
+/* ===== estado ===== */
+const KEY="receita-porcentagem-v1";
+const EXAMPLE_TXT="3 bananas maduras\n2 ovos\n1 xícara de aveia em flocos\n1/2 xícara de farinha de trigo integral\n1/2 xícara de açúcar mascavo\n1/4 xícara de óleo de coco\n1 colher de chá de canela em pó\n1 colher de sopa de fermento em pó\nNozes picadas a gosto";
+let S;
+try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(!S||!S.cur)S={recipes:[],cur:null};
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const f=(n,d=1)=>(+n).toLocaleString("pt-BR",{minimumFractionDigits:0,maximumFractionDigits:d});
+const f2=n=>(+n).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});
+
+function fromText(txt,name){
+  const rows=[],ign=[];
+  txt.split(/\n/).forEach(l=>{if(!l.trim())return;const r=parseLine(l);if(!r)return;if(r.ignored)ign.push(r.ignored);else rows.push(r)});
+  return {rows,ign};
+}
+function loadExample(){
+  const {rows,ign}=fromText(EXAMPLE_TXT);
+  S.cur={name:"Bolo de banana com aveia (exemplo)",paste:EXAMPLE_TXT,rows,target:"",ign};
+}
+if(!S.cur)loadExample();
+
+/* ===== tela ===== */
+function renderIngs(focus){
+  const c=S.cur;$("rname").value=c.name||"";$("paste").value=c.paste||"";
+  const ig=$("ignored");
+  if(c.ign&&c.ign.length){ig.hidden=false;ig.innerHTML="Fora da conta (sem quantidade): "+c.ign.map(esc).join(" · ")}else ig.hidden=true;
+  $("ings").innerHTML=c.rows.length?c.rows.map((r,i)=>{const cv=convert(r);const shown=r.ov!=null&&r.ov!==""?r.ov:(cv.v?f(cv.v):"");return `
+    <div class="ing" data-i="${i}" style="--dot:${COL(i)}">
+      <input class="name" id="in${i}" value="${esc(r.name)}" placeholder="Ingrediente" aria-label="Ingrediente">
+      <button class="del" aria-label="Remover ${esc(r.name)}">×</button>
+      <div class="meas">
+        <input class="qty" id="iq${i}" value="${r.q===""?"":esc(String(r.q).replace(".",","))}" inputmode="decimal" aria-label="Quantidade">
+        <select class="unit" id="iu${i}" aria-label="Medida">${UNITS.map(([v,l])=>`<option value="${v}"${v===r.u?" selected":""}>${l}</option>`).join("")}</select>
+        <span class="eq">=</span>
+        <div class="gbox"><input class="gr${r.ov!=null&&r.ov!==""?" ov":""}" id="ig${i}" value="${esc(shown)}" inputmode="decimal" aria-label="Peso em gramas ou ml"><span>${cv.kind}</span></div>
+        ${cv.note?`<div class="note ${cv.note[0]}">${cv.note[1]}</div>`:""}
+      </div>
+    </div>`}).join(""):`<p class="empty">Cole uma receita acima e toque em "Converter para gramas", ou adicione os ingredientes um a um.</p>`;
+  if(focus){const el=$(focus);if(el)el.focus()}
+  renderResult();
+}
+function renderResult(){
+  const c=S.cur;
+  const items=c.rows.map((r,i)=>({name:r.name||"Ingrediente",col:COL(i),...convert(r)})).filter(x=>x.v>0);
+  const total=items.reduce((a,x)=>a+x.v,0);
+  if(!total){
+    $("totalW").textContent="0";$("totalN").textContent="0 itens";$("comp").innerHTML="";$("legend").innerHTML="";
+    $("resTable").innerHTML='<p class="empty">Os resultados aparecem quando houver ingredientes com peso.</p>';return;
+  }
+  const factor=100/total;
+  $("totalW").textContent=f(total);
+  $("totalN").textContent=`${items.length} ${items.length===1?"item":"itens"}`;
+  $("comp").innerHTML=items.map(x=>`<i style="width:${x.v*factor}%;background:${x.col}" title="${esc(x.name)}"></i>`).join("");
+  $("legend").innerHTML=items.map(x=>`<span><i style="background:${x.col}"></i>${esc(x.name)}</span>`).join("");
+  const letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const tgt=pnum(c.target)||total;
+  $("target").value=c.target||"";$("target").placeholder=f(total);
+  const rows=items.map((x,i)=>{const pct=x.v*factor;return `<tr>
+    <td><span class="nm"><i class="dot" style="background:${x.col}"></i>${esc(x.name)}</span><small>original: ${f(x.v)} ${x.kind}</small></td>
+    <td class="new">${f(tgt*pct/100)} ${x.kind}</td></tr>`}).join("");
+  $("resTable").innerHTML=`<div class="tablewrap"><table>
+    <thead><tr><th>Ingrediente</th><th>Para ${f(tgt)} g</th></tr></thead>
+    <tbody>${rows}</tbody>
+    <tfoot><tr><td>Total</td><td class="new">${f(tgt)} g</td></tr></tfoot></table></div>`;
+  c._last={items,factor,tgt,total};
+}
+function renderSaved(){
+  $("saved").innerHTML=(S.recipes.length?'<span class="lbl">Minhas receitas</span>':"")+S.recipes.map((r,i)=>`<span class="chip"><button data-load="${i}">${esc(r.name||"Sem nome")}</button><button class="x" data-rm="${i}" aria-label="Apagar ${esc(r.name)}">×</button></span>`).join("");
+}
+
+/* ===== eventos ===== */
+$("convert").onclick=()=>{
+  const {rows,ign}=fromText($("paste").value);
+  S.cur.rows=rows;S.cur.ign=ign;S.cur.paste=$("paste").value;
+  if(/\(exemplo\)/.test(S.cur.name||""))S.cur.name="";
+  save();renderIngs();
+};
+function askClear(btn){
+  document.querySelectorAll(".confirmbar").forEach(x=>x.remove());
+  const bar=document.createElement("div");bar.className="confirmbar";
+  bar.innerHTML='<span>Apagar a receita e começar outra?</span><button class="btn primary">Sim, apagar tudo</button><button class="btn">Cancelar</button>';
+  btn.closest(".row-btns").after(bar);
+  const [yes,no]=bar.querySelectorAll("button");
+  yes.onclick=()=>{bar.remove();S.cur={name:"",paste:"",rows:[],target:"",ign:[]};save();renderIngs();window.scrollTo({top:0,behavior:"smooth"});$("paste").focus({preventScroll:true})};
+  no.onclick=()=>bar.remove();
+}
+document.querySelectorAll(".clearall").forEach(b=>b.onclick=()=>askClear(b));
+$("rname").oninput=e=>{S.cur.name=e.target.value;save()};
+$("paste").oninput=e=>{S.cur.paste=e.target.value;save()};
+$("addIng").onclick=()=>{S.cur.rows.push({name:"",q:"",u:"g",ov:null});save();renderIngs("in"+(S.cur.rows.length-1))};
+$("ings").addEventListener("input",e=>{
+  const row=e.target.closest(".ing");if(!row)return;const r=S.cur.rows[+row.dataset.i];
+  if(e.target.classList.contains("name"))r.name=e.target.value;
+  else if(e.target.classList.contains("qty"))r.q=pnum(e.target.value)||"";
+  else if(e.target.classList.contains("gr")){r.ov=e.target.value.trim()===""?null:e.target.value;e.target.classList.toggle("ov",r.ov!=null);save();renderResult();return}
+  save();renderResult();
+});
+$("ings").addEventListener("change",e=>{
+  const row=e.target.closest(".ing");if(!row)return;const r=S.cur.rows[+row.dataset.i];
+  if(e.target.classList.contains("unit")){r.u=e.target.value;r.ov=null;save();renderIngs();return}
+  if(e.target.matches(".qty,.name")){save();renderIngs()} // atualiza conversão e avisos
+});
+$("ings").addEventListener("click",e=>{const b=e.target.closest(".del");if(!b)return;S.cur.rows.splice(+b.closest(".ing").dataset.i,1);save();renderIngs()});
+$("target").oninput=e=>{S.cur.target=e.target.value;save();renderResult()};
+$("quick").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;S.cur.target=b.dataset.t==="orig"?"":b.dataset.t;save();renderResult()});
+
+$("copy").onclick=async()=>{
+  const L=S.cur._last;if(!L)return;
+  const txt=`${S.cur.name||"Receita"}\nTotal: ${f(L.tgt)} g\n\n`+L.items.map(x=>`${x.name}: ${f(L.tgt*x.v*L.factor/100)} ${x.kind}`).join("\n");
+  try{await navigator.clipboard.writeText(txt);$("copied").textContent="Copiado!"}
+  catch(err){const ta=document.createElement("textarea");ta.value=txt;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();
+    try{document.execCommand("copy");$("copied").textContent="Copiado!"}catch(_){$("copied").textContent="Não deu para copiar. Selecione a tabela e copie."}ta.remove()}
+  setTimeout(()=>$("copied").textContent="",2500);
+};
+$("save").onclick=()=>{
+  const c=S.cur;const copy={name:c.name||"Receita sem nome",paste:c.paste,rows:JSON.parse(JSON.stringify(c.rows)),target:c.target,ign:c.ign||[]};
+  const i=S.recipes.findIndex(r=>r.name===copy.name);
+  if(i>=0)S.recipes[i]=copy;else S.recipes.push(copy);
+  save();renderSaved();$("copied").textContent="Receita salva!";setTimeout(()=>$("copied").textContent="",2500);
+};
+$("saved").addEventListener("click",e=>{
+  const l=e.target.closest("[data-load]"),x=e.target.closest("[data-rm]");
+  if(l){S.cur=JSON.parse(JSON.stringify(S.recipes[+l.dataset.load]));save();renderIngs();window.scrollTo({top:0,behavior:"smooth"})}
+  else if(x){S.recipes.splice(+x.dataset.rm,1);save();renderSaved()}
+});
+renderSaved();renderIngs();
+</script>
+
+<script>if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("/sw.js").catch(()=>{}));</script>
+</body>
+</html>

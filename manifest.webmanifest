@@ -1,0 +1,14 @@
+{
+  "name": "Faça Sua Receita",
+  "short_name": "Receitas",
+  "description": "Converta qualquer receita para gramas e faça na quantidade que você quiser.",
+  "lang": "pt-BR",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#eef3ea",
+  "theme_color": "#1b4425",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
